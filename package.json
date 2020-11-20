@@ -1,0 +1,28 @@
+{
+  "name": "totaljs-comp",
+  "version": "1.0.0",
+  "description": "Encanto totaljs components",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Encanto/totaljs-comp.git"
+  },
+  "author": "William R Clark",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Encanto/totaljs-comp/issues"
+  },
+  "homepage": "https://github.com/Encanto/totaljs-comp#readme",
+  "devDependencies": {
+    "@types/mathjs": "^6.0.7",
+    "@types/node": "^14.14.9",
+    "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "mathjs": "^8.0.1"
+  }
+}
