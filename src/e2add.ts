@@ -11,85 +11,60 @@ exports.author = 'William Clark';
 exports.icon = 'plus-circle';  // Icon reference from https://fontawesome.com/v4.7.0/icons/
 exports.input = true;
 exports.output = 1;
+exports.options = { enabled: true };
+exports.readme = `# Counter
 
-exports.options = { outputs: 1, code: 'send(0, value);', keepmessage: true };
+Counter counts all received data by months.`;
 
 exports.html = `<div class="padding">
-	<div class="row">
-		<div class="col-md-3">
-			<div data-jc="textbox" data-jc-path="outputs" data-jc-config="type:number;validation:value > 0;increment:true;maxlength:3">@(Number of outputs)</div>
-			<div class="help m">@(Minimum is 1)</div>
-		</div>
-	</div>
-	<div data-jc="codemirror" data-jc-path="code" data-jc-config="type:javascript;required:true;height:500;tabs:true;trim:true" class="m">@(Code)</div>
-	<div data-jc="checkbox" data-jc-path="keepmessage">@(Keep message instance)</div>
+	<div><i class="fa fa-bar-chart mr5"></i>@(Counter for last 12 months)</div>
+	<div data-jc="nosqlcounter" data-jc-path="flowcounterstats" class="m mt10" data-jc-noscope="true" style="height:100px"></div>
 </div>
-<script>
-	var code_outputs_count;
+<script>ON('open.counter', function(instance) {
+	TRIGGER('{0}', { id: instance.id }, 'flowcounterstats');
+});</script>`.format(ID);
 
-	ON('open.code', function(component, options) {
-		code_outputs_count = options.outputs = options.outputs || 1;
+exports.install = function(instance) {
+
+	var count = 0;
+
+	instance.on('data', function() {
+		count++;
+		NOSQL(ID).counter.hit(instance.id, 1);
+		instance.custom.status();
 	});
 
-	ON('save.code', function(component, options) {
-		if (code_outputs_count !== options.outputs) {
-			if (flow.version < 511) {
-				component.connections = {};
-				setState(MESSAGES.apply);
-			}
-			component.output = options.outputs || 1;
-		}
-	});
-</script>`;
-
-exports.readme = `# Code
-
-This component executes custom JavaScript code as it is and it doesn't contain any secure scope.
-
-\`\`\`javascript
-// value {Object} contains received data
-// send(outputIndex, newValue) sends a new value
-// error(value) sends an error
-// instance {Object} a current component instance
-// flowdata {Object} a current flowdata
-// repository {Object} a current repository of flowdata
-// Example:
-
-// send() can be execute multiple times
-send(0, value);
-\`\`\``;
-
-exports.install = function(instance: any) {
-
-	var fn: any;
-
-	instance.on('data', function(response: any) {
-		if (fn) {
-			try {
-				fn(response.data, instance, response, instance.options, response.repository, require);
-			} catch (e) {
-				response.data = e;
-				instance.throw(response);
-			}
-		}
-	});
-
-	instance.reconfigure = function() {
-		try {
-			if (instance.options.code) {
-				instance.status('');
-				var code = 'var send = function(index, value) { if (options.keepmessage) { flowdata.data = value; instance.send2(index, flowdata); } else instance.send2(index, value);}; var error = function(err) { instance.throw(err); }; ' + instance.options.code;
-				fn = new Function('value', 'instance', 'flowdata', 'options', 'repository', 'require', code);
-			} else {
-				instance.status('Not configured', 'red');
-				fn = null;
-			}
-		} catch (e) {
-			fn = null;
-			instance.error('Code: ' + e.message);
-		}
+	instance.custom.stats = function(callback) {
+		NOSQL(ID).counter.monthly(instance.id, function(err, response) {
+			callback(err, response);
+		});
 	};
 
-	instance.on('options', instance.reconfigure);
-	instance.reconfigure();
+	instance.custom.reset = function(callback) {
+		NOSQL(ID).counter.clear(function() {
+			callback && callback();
+		});
+	};
+
+	instance.custom.status = function() {
+		setTimeout2(instance.id, function() {
+			instance.status(count.format(0));
+			instance.send2(count);
+		}, 100);
+	};
+
+	NOSQL(ID).counter.count(instance.id, function(err, response) {
+		count = response;
+		instance.custom.status();
+	});
+};
+
+FLOW.trigger(ID, function(next, data) {
+	NOSQL(ID).counter.monthly(data.id, function(err, response) {
+		next(response);
+	});
+});
+
+exports.uninstall = function() {
+	FLOW.trigger(ID, null);
 };
