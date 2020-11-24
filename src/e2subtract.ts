@@ -25,7 +25,7 @@ exports.install = function(instance: any) {
 	var count: math.MathType = 0.0;
 
 	instance.on('data', function(data: any) {
-        console.log('data recieved:' + JSON.stringify(data));
+        // console.log('data recieved:' + JSON.stringify(data));
         count = math.subtract(count, data.data);
 		instance.custom.status();
 	});
