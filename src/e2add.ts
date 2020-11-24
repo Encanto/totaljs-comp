@@ -4,7 +4,7 @@ const ID = 'e2add';
 
 exports.id = 'e2add';
 exports.title = 'Add';
-exports.group = 'Common';
+exports.group = 'Math';
 exports.color = '#08a351';
 exports.version = '1.0.0';
 exports.author = 'William Clark';
@@ -32,7 +32,7 @@ exports.install = function(instance: any) {
 		instance.custom.status();
 	});
 
-	instance.custom.stats = function(callback) {
+	instance.custom.stats = function(callback: ICallback) {
 	};
 
 
@@ -44,7 +44,6 @@ exports.install = function(instance: any) {
 	};
 
 };
-
 
 exports.uninstall = function() {
 	FLOW.trigger(ID, null);
