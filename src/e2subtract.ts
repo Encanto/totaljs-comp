@@ -41,6 +41,12 @@ exports.install = function(instance: any) {
 		}, 100);
 	};
 
+	instance.custom.reconfigure = function() {
+		count = instance.options.initialvalue;
+	};
+
+	instance.custom.reconfigure();
+	instance.on('options', instance.custom.reconfigure);
 };
 
 exports.uninstall = function() {
