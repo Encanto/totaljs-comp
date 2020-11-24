@@ -17,10 +17,8 @@ exports.readme = `# Add Numbers
 Adds numeric values recieved together, and outputs total.`;
 
 exports.html = `<div class="padding">
-</div>
-<script>ON('open.counter', function(instance) {
-	TRIGGER('{0}', { id: instance.id }, 'flowcounterstats');
-});</script>`.format(ID);
+	<div data-jc="textbox" data-jc-path="initialvalue" data-jc-config="placeholder:0;increment:true;type:number;align:center">@(Initial Value)</div>
+</div>`.format(ID);
 
 exports.install = function(instance: any) {
 
