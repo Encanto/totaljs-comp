@@ -12,13 +12,11 @@ exports.icon = 'plus-circle';  // Icon reference from https://fontawesome.com/v4
 exports.input = true;
 exports.output = 1;
 exports.options = { enabled: true };
-exports.readme = `# Add numbers
+exports.readme = `# Add Numbers
 
-Adds all values recieved together, and outputs total.`;
+Adds numeric values recieved together, and outputs total.`;
 
 exports.html = `<div class="padding">
-	<div><i class="fa fa-bar-chart mr5"></i>@(Counter for last 12 months)</div>
-	<div data-jc="nosqlcounter" data-jc-path="flowcounterstats" class="m mt10" data-jc-noscope="true" style="height:100px"></div>
 </div>
 <script>ON('open.counter', function(instance) {
 	TRIGGER('{0}', { id: instance.id }, 'flowcounterstats');
@@ -31,21 +29,12 @@ exports.install = function(instance: any) {
 	instance.on('data', function(data: any) {
         console.log('data recieved:' + JSON.stringify(data));
         count = math.add(count, data.data);
-		NOSQL(ID).counter.hit(instance.id, 1);
 		instance.custom.status();
 	});
 
 	instance.custom.stats = function(callback) {
-		NOSQL(ID).counter.monthly(instance.id, function(err, response) {
-			callback(err, response);
-		});
 	};
 
-	instance.custom.reset = function(callback) {
-		NOSQL(ID).counter.clear(function() {
-			callback && callback();
-		});
-	};
 
 	instance.custom.status = function() {
 		setTimeout2(instance.id, function() {
@@ -54,17 +43,8 @@ exports.install = function(instance: any) {
 		}, 100);
 	};
 
-	NOSQL(ID).counter.count(instance.id, function(err, response) {
-		count = response;
-		instance.custom.status();
-	});
 };
 
-FLOW.trigger(ID, function(next, data) {
-	NOSQL(ID).counter.monthly(data.id, function(err, response) {
-		next(response);
-	});
-});
 
 exports.uninstall = function() {
 	FLOW.trigger(ID, null);
