@@ -43,6 +43,7 @@ exports.install = function(instance: any) {
 
 	instance.custom.reconfigure = function() {
 		count = instance.options.initialvalue;
+		instance.custom.status();
 	};
 
 	instance.custom.reconfigure();
