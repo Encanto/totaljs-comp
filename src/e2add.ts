@@ -1,4 +1,4 @@
-var math = require('mathjs');
+import math = require('mathjs');
 
 const ID = 'e2add';
 
@@ -12,9 +12,9 @@ exports.icon = 'plus-circle';  // Icon reference from https://fontawesome.com/v4
 exports.input = true;
 exports.output = 1;
 exports.options = { enabled: true };
-exports.readme = `# Counter
+exports.readme = `# Add numbers
 
-Counter counts all received data by months.`;
+Adds all values recieved together, and outputs total.`;
 
 exports.html = `<div class="padding">
 	<div><i class="fa fa-bar-chart mr5"></i>@(Counter for last 12 months)</div>
@@ -24,12 +24,13 @@ exports.html = `<div class="padding">
 	TRIGGER('{0}', { id: instance.id }, 'flowcounterstats');
 });</script>`.format(ID);
 
-exports.install = function(instance) {
+exports.install = function(instance: any) {
 
-	var count = 0;
+	var count: math.MathType = 0.0;
 
-	instance.on('data', function() {
-		count++;
+	instance.on('data', function(data: any) {
+        console.log('data recieved:' + JSON.stringify(data));
+        count = math.add(count, data.data);
 		NOSQL(ID).counter.hit(instance.id, 1);
 		instance.custom.status();
 	});
@@ -48,7 +49,7 @@ exports.install = function(instance) {
 
 	instance.custom.status = function() {
 		setTimeout2(instance.id, function() {
-			instance.status(count.format(0));
+			instance.status('total: ' + count.toString());
 			instance.send2(count);
 		}, 100);
 	};
