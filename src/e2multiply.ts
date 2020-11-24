@@ -30,7 +30,7 @@ exports.install = function(instance: any) {
 		instance.custom.status();
 	});
 
-	instance.custom.stats = function(callback: ICallback) {
+	instance.custom.stats = function(callback: Function) {
 	};
 
 
